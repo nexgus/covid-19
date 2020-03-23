@@ -1,0 +1,6 @@
+BeautifulSoup4
+iso3166
+numpy
+pandas
+plotly==4.5.4
+requests
