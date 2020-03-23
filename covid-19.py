@@ -1,13 +1,14 @@
 ﻿#!/usr/bin/env python
 # -*- coding=utf-8 -*-
 import argparse
-import bs4
 import iso3166
 import numpy as np
 import os
 import pandas as pd
 import plotly.graph_objects as go
 import requests
+
+from bs4 import BeautifulSoup
 
 ##############################################################################################################
 SRCURL = 'https://www.worldometers.info/coronavirus'
@@ -115,13 +116,13 @@ def save(filepath, x):
 ##############################################################################################################
 def main(args):
     r = requests.get(SRCURL)
-    soup = bs4.BeautifulSoup(r.text, 'html.parser')
-    if args.debug: save('./html/soup.html')
+    soup = BeautifulSoup(r.text, 'html.parser')
+    if args.debug: save('./html/soup.html', soup)
 
     title = get_title(soup, args.key)
 
     table = soup.find('table', {'id': 'main_table_countries_today'})
-    if args.debug: save('./html/table.html')
+    if args.debug: save('./html/table.html', table)
 
     stats = get_stats(table)
     df = pd.DataFrame(data=stats)
