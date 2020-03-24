@@ -38,20 +38,54 @@ CORRECTION = {
     'St. Vincent Grenadines':   'VCT', # 'Saint Vincent And The Grenadines',
     'Sint Maarten':             'SXM', # 'Sint Maarten (Dutch Part)',
     'Syria':                    'SYR', # 'Syrian Arab Republic'
+    'Turks and Caicos':         'TCA', # 'Turks and Caicos Islands'
 }
 
 ##############################################################################################################
-def get_number(number, ntype=int):
-    if number is None: return ntype(0)
-    number = number.strip().replace(',', '')
-    if number == '': return ntype(0)
-    return ntype(number)
+def add_country_code(data):
+    indices_no_cc = [] # indices for no country code
+    data['country_code'] = []
+    data['country_name'] = [] # country.apolitical_name
+    for idx, country in enumerate(data['country']):
+        try:
+            country = iso3166.countries.get(country)
+        except KeyError:
+            if country in CORRECTION:
+                country = iso3166.countries.get(CORRECTION[country])
+            else:
+                if country == 'Channel Islands':
+                    # Treat Channel Islands as a part of UK
+                    # https://en.wikipedia.org/wiki/Channel_Islands
+                    idx_uk = data['country'].index('UK')
+                    data['total'][idx_uk]     += data['total'][idx]    
+                    data['death'][idx_uk]     += data['death'][idx]    
+                    data['recovered'][idx_uk] += data['recovered'][idx]
+                    data['active'][idx_uk]    += data['active'][idx]   
+                elif country == 'Diamond Princess':
+                    # Not a country
+                    # https://en.wikipedia.org/wiki/Diamond_Princess_(ship)
+                    pass
+                else:
+                    print(f'"{country}" is not in ISO3166 country names. Remove it.')
+                indices_no_cc.append(idx)
+                continue
+        data['country_code'].append(country.alpha3)
+        data['country_name'].append(country.apolitical_name)
+
+    indices_no_cc.sort(reverse=True)
+    for idx in indices_no_cc:
+        data['country'].pop(idx)
+        data['total'].pop(idx)
+        data['death'].pop(idx)
+        data['recovered'].pop(idx)
+        data['active'].pop(idx)
+
+    return data
 
 ##############################################################################################################
-def get_stats(table):
-    stats = {
-        'country_name': [],
-        'country_code': [],
+def collect_data(table):
+    data = { # Just for store data from source
+        'country':   [],
         'total':     [],
         'active':    [],
         'death':     [],
@@ -60,42 +94,13 @@ def get_stats(table):
 
     for tr in table.tbody.find_all('tr'):
         td = tr.find_all('td')
-        country   = td[0].string.strip()
-        total     = get_number(td[1].string) # total cases
-        death     = get_number(td[3].string) # total deaths
-        recovered = get_number(td[5].string) # total recovered
-        active    = get_number(td[6].string) # active cases
+        data['country'].append(td[0].string.strip())
+        data['total'].append(to_number(td[1].string))
+        data['death'].append(to_number(td[3].string))
+        data['recovered'].append(to_number(td[5].string))
+        data['active'].append(to_number(td[6].string))
 
-        try:
-            country = iso3166.countries.get(country)
-        except KeyError:
-            if country in CORRECTION:
-                country = CORRECTION[country]
-                country = iso3166.countries.get(country)
-            elif country == 'Diamond Princess':
-                continue
-            elif country == 'Channel Islands':
-                if 'GBR' in stats['country_code']: # UK
-                    idx = stats['country_code'].index('GBR')
-                    stats['total'][idx]     += total
-                    stats['active'][idx]    += active
-                    stats['death'][idx]     += death
-                    stats['recovered'][idx] += recovered
-                    continue
-                else:
-                    country = iso3166.countries.get('GBR')
-            else:
-                print(f'"{country}" is not in ISO3166 country names.')
-                continue
-
-        stats['country_name'].append(country.apolitical_name)
-        stats['country_code'].append(country.alpha3)
-        stats['total'].append(total)
-        stats['active'].append(active)
-        stats['death'].append(death)
-        stats['recovered'].append(recovered)
-
-    return stats
+    return data
 
 ##############################################################################################################
 def get_title(soup, key):
@@ -114,6 +119,13 @@ def save(filepath, x):
         fp.write(x.prettify())
 
 ##############################################################################################################
+def to_number(number, ntype=int):
+    if number is None: return ntype(0)
+    number = number.strip().replace(',', '')
+    if number == '': return ntype(0)
+    return ntype(number)
+
+##############################################################################################################
 def main(args):
     r = requests.get(SRCURL)
     soup = BeautifulSoup(r.text, 'html.parser')
@@ -124,8 +136,9 @@ def main(args):
     table = soup.find('table', {'id': 'main_table_countries_today'})
     if args.debug: save('./html/table.html', table)
 
-    stats = get_stats(table)
-    df = pd.DataFrame(data=stats)
+    data = collect_data(table)
+    data = add_country_code(data)
+    df = pd.DataFrame(data)
 
     if args.log:
         df['log'] = np.ma.log(df[args.key].to_numpy().astype(float))
