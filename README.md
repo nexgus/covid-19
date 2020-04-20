@@ -8,15 +8,15 @@ pip install -r requirements.txt
 
 ## Syntax
 ```
-usage: covid-19.py [-h] [--key {active,total,death,recovered}] [--log]
-                   [--debug]
+usage: covid-19.py [-h]
+                   [--key {cases,deaths,recovered,active,casesPerMillion,deathsPerMillion}]
+                   [--log]
 
 NCOVID-19 Breakout.
 
 optional arguments:
   -h, --help            show this help message and exit
-  --key {active,total,death,recovered}
+  --key {cases,deaths,recovered,active,casesPerMillion,deathsPerMillion}
                         Use total to select color. (default: active)
   --log                 Log color. (default: False)
-  --debug               For debug only. (default: False)
 ```
