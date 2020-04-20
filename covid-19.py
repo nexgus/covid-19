@@ -10,8 +10,8 @@ import plotly.graph_objects as go
 import requests
 
 ##############################################################################################################
-API_Countries = 'https://corona.lmao.ninja/countries?sort=country'
-API_All = 'https://corona.lmao.ninja/all'
+API_Countries = 'https://corona.lmao.ninja/v2/countries?sort=country'
+API_All = 'https://corona.lmao.ninja/v2/all'
 KEYS = ['cases', 'deaths', 'recovered', 'active', 'casesPerMillion', 'deathsPerMillion']
 
 ##############################################################################################################
