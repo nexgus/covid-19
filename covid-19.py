@@ -14,18 +14,34 @@ API_Countries = 'https://corona.lmao.ninja/v2/countries?sort=country'
 API_All = 'https://corona.lmao.ninja/v2/all'
 KEYS = ['cases', 'deaths', 'recovered', 'active', 'casesPerMillion', 'deathsPerMillion']
 
+# For detail please visit https://documenter.getpostman.com/view/8854915/SzS7R6uu?version=latest
+# or https://github.com/NovelCOVID/API
+API = {
+    # Returns all total cases, recovery, and deaths.
+    'All': 'https://corona.lmao.ninja/v2/all',
+    # Returns data of all countries that has COVID-19.
+    'Countries': 'https://corona.lmao.ninja/v2/countries?sort=country',
+    # Returns data of a specific country.
+    'Country': 'https://corona.lmao.ninja/v2/countries/<country>',
+    # Returns all United States of America and their Corona data.
+    'States': 'https://corona.lmao.ninja/v2/states',
+    # Return data from the John Hopkins CSSE Data Repository (Provinces and such).
+    'John HOpkins CSSE Data': 'https://corona.lmao.ninja/v2/jhucsse',
+    # Get historical data from the start of 2020. (JHU CSSE GISand Data).
+    'Historical Data': 'https://corona.lmao.ninja/v2/historical',
+}
+
 ##############################################################################################################
 def main(args):
-    r = requests.get(API_All)
+    r = requests.get(API['All'])
     total = eval(r.content.decode('utf-8'))
     updated = datetime.datetime.fromtimestamp(total['updated']//1000).astimezone().isoformat()
-    #.replace(tzinfo=datetime.timezone.utc).astimezone().replace(microsecond=0).isoformat()
     title = (f'COVID-19 Breakout ({args.key}) {updated}' +
              f'<br>Cases: {total["cases"]}' + 
              f'<br>Deaths: {total["deaths"]}' + 
              f'<br>Recovered: {total["recovered"]}')
 
-    r = requests.get(API_Countries)
+    r = requests.get(API['Countries'])
     data = json.loads(r.content.decode('utf-8'))
 
     info = {
