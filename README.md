@@ -1,9 +1,7 @@
 # A Simple COVID-19 Choropleth
-Data source: [WorldMeter](https://www.worldometers.info/coronavirus)
-API: [NovelCOVID API](https://github.com/NovelCOVID/API)
-API Document: https://documenter.getpostman.com/view/8854915/SzS7R6uu?version=latest
-
- (github.com/NovelCOVID/API)
+Data source: [WorldMeter](https://www.worldometers.info/coronavirus)  
+API: [NovelCOVID API](https://github.com/NovelCOVID/API)  
+API Document: https://documenter.getpostman.com/view/8854915/SzS7R6uu?version=latest  
 
 ## Install Dependencies
 ```python
