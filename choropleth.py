@@ -91,11 +91,11 @@ def main(args):
     color_bar = ColorBar(
         color_mapper=color_mapper, 
         label_standoff=8, 
-        width=fig_width, 
-        height=20,
+        width=20, 
+        height=int(fig_height*0.9),
         border_line_color=None,
         location=(0, 0), 
-        orientation='horizontal',
+        orientation='vertical',
         major_label_overrides=tick_labels,
     )
 
@@ -124,10 +124,10 @@ def main(args):
             ('Deaths', '@deaths'),
             ('Recovered', '@recovered'),
             ('Active', '@active'),
-            ('Cases/Million', '@casesPerMillion'),
-            ('Deaths/Million', '@deathsPerMillion'),
+            ('Cases/Million', '@casesPerMillion'),      # to-do: can it be float?
+            ('Deaths/Million', '@deathsPerMillion'),    # to-do: can it be float?
     ]))
-    fig.add_layout(color_bar, 'below')
+    fig.add_layout(color_bar, 'right')
     show(fig)
 
 ##############################################################################################################
