@@ -35,8 +35,8 @@ def main(args):
     # Collect world summary for graph title.
     data = NovelCOVIDApi.get_all()
     updated = NovelCOVIDApi.to_datetime(data['updated']).astimezone().isoformat()
-    title = 'COVID-19 Breakout ({} {}) Cases: {}, Deaths: {}, Recovered: {}'.format(
-        updated, args.key, data['cases'], data['deaths'], data['recovered'])
+    title = 'COVID-19 Breakout ({} @ {}) Cases: {}, Deaths: {}, Recovered: {}'.format(
+        args.key, updated, data['cases'], data['deaths'], data['recovered'])
 
     # Collect data for each country.
     data = NovelCOVIDApi.get_countries()
